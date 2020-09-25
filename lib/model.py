@@ -3,7 +3,7 @@ from torch import nn
 
 class ARCNN(nn.Module):
     def __init__(self):
-        super(ARCNN, self).__init__()
+        super().__init__()
         self.base = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=9, padding=4),
             nn.PReLU(),
@@ -29,7 +29,7 @@ class ARCNN(nn.Module):
 
 class FastARCNN(nn.Module):
     def __init__(self):
-        super(FastARCNN, self).__init__()
+        super().__init__()
         self.base = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=9, stride=2, padding=4),
             nn.PReLU(),
