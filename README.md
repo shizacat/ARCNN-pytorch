@@ -5,8 +5,8 @@ This repository is implementation of the "Deep Convolution Networks for Compress
 In contrast with original paper, It use RGB channels instead of luminance channel in YCbCr space and smaller(16) batch size.
 
 Papers:
-- (arXiv:1504.06993v1 27 Apr 2015)[https://arxiv.org/pdf/1504.06993.pdf]: Compression Artifacts Reduction by a Deep Convolutional Network. ARCNN
-- (arXiv:1608.02778v1 09 Aug 2016)[https://arxiv.org/pdf/1608.02778.pdf]: Deep Convolution Networks for Compression Artifacts Reduction. Fast ARCNN
+- [arXiv:1504.06993v1 27 Apr 2015](https://arxiv.org/pdf/1504.06993.pdf): Compression Artifacts Reduction by a Deep Convolutional Network. ARCNN
+- [arXiv:1608.02778v1 09 Aug 2016[(https://arxiv.org/pdf/1608.02778.pdf): Deep Convolution Networks for Compression Artifacts Reduction. Fast ARCNN
 
 ## Requirements
 - PyTorch
