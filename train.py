@@ -11,7 +11,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from lib.model import ARCNN, FastARCNN
+from lib.model import get_model_by_name
 from lib.data import get_train_dataset, get_valid_dataset
 from lib.utils import AverageMeter
 from lib import metrics
@@ -19,14 +19,14 @@ from lib import metrics
 
 def arguments():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--data_folder', type=str, required=True)
+    parser.add_argument('--outputs_dir', type=str, required=True)
     parser.add_argument(
         '--arch',
         type=str,
         default='ARCNN',
-        help='ARCNN or FastARCNN'
+        help='ARCNN or FastARCNN or VDSR'
     )
-    parser.add_argument('--data_folder', type=str, required=True)
-    parser.add_argument('--outputs_dir', type=str, required=True)
     parser.add_argument(
         "--save_result",
         default=10,
@@ -35,7 +35,9 @@ def arguments():
     )
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--num_epochs', type=int, default=20)
-    parser.add_argument('--lr', type=float, default=5e-4)
+    parser.add_argument(
+        '--lr', type=float, default=5e-4, help="Learning rate, default 5e-4"
+    )
     parser.add_argument('--seed', type=int, default=123)
     parser.add_argument(
         '--model',
@@ -86,7 +88,7 @@ def train_one_epoch(model, optimizer, train_loader, criterion):
     return epoch_losses.avg
 
 
-def validation(model, val_loader, criterion, get_images=False):
+def validation(model, val_loader, criterion, device, get_images=False):
     images = []
 
     model.eval()
@@ -150,22 +152,19 @@ if __name__ == "__main__":
     torch.manual_seed(opt.seed)
 
     # Load model and et
-    if opt.arch == 'ARCNN':
-        model = ARCNN()
-    elif opt.arch == 'FastARCNN':
-        model = FastARCNN()
-
+    print("Load model:", opt.arch)
+    model = get_model_by_name(opt.arch, opt.model)
     model = model.to(device)
-    if opt.model is not None:
-        print("Load model:", opt.model)
-        model.load_state_dict(torch.load(opt.model))
 
     criterion = nn.MSELoss()
 
-    optimizer = optim.Adam([
-        {'params': model.base.parameters()},
-        {'params': model.last.parameters(), 'lr': opt.lr * 0.1},
-    ], lr=opt.lr)
+    if opt.arch in ["ARCNN", "FastARCNN"]:
+        optimizer = optim.Adam([
+            {'params': model.base.parameters()},
+            {'params': model.last.parameters(), 'lr': opt.lr * 0.1},
+        ], lr=opt.lr)
+    else:
+        optimizer = optim.Adam(model.parameters(), lr=opt.lr)
 
     # Load dataset
     train_set = get_train_dataset(
@@ -197,7 +196,7 @@ if __name__ == "__main__":
             model, optimizer, train_loader, criterion
         )
         images, val_loss, psnr, ssim = validation(
-            model, val_loader, criterion, (epoch % opt.save_result) == 0
+            model, val_loader, criterion, device, (epoch % opt.save_result) == 0
         )
 
         # Save images result

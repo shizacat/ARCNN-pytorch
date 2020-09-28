@@ -4,11 +4,11 @@ import os
 import argparse
 
 import torch
-from PIL import Image
+from PIL import Image, ImageOps
 from torchvision.transforms import ToTensor, ToPILImage
 import torchvision.utils as utils
 
-from lib.model import ARCNN, FastARCNN
+from lib.model import get_model_by_name
 
 
 def arguments():
@@ -42,21 +42,23 @@ def gen_filename(filepath) -> str:
     return os.path.join(path, "out_{}.png".format(name))
 
 
+def image_prepea(filepath) -> torch.Tensor:
+    """Открывает и подготавливает файл для отправки в нейронную сеть"""
+    img = Image.open(filepath)
+    img = img.convert("RGB")  # 3 канала
+    # img = ImageOps.autocontrast(img)
+    return ToTensor()(img).unsqueeze(0)
+
+
 if __name__ == "__main__":
     opt = arguments()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load model and et
-    if opt.arch == 'ARCNN':
-        model = ARCNN()
-    elif opt.arch == 'FastARCNN':
-        model = FastARCNN()
-
+    model = get_model_by_name(opt.arch, opt.model)
     model = model.to(device)
-    model.load_state_dict(torch.load(opt.model))
 
-    img_input = Image.open(opt.image).convert("RGB")
-    pred = model(ToTensor()(img_input).unsqueeze(0).to(device))
+    pred = model(image_prepea(opt.image).to(device))
     img_out = pred.data.cpu().squeeze(0)
     utils.save_image(img_out, gen_filename(opt.image))

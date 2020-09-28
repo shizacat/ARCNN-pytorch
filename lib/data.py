@@ -9,7 +9,7 @@ from torchvision.transforms import (
 
 
 class TransformImgToJpg:
-    def __init__(self, jpeg_quality=9):
+    def __init__(self, jpeg_quality=1):
         self.jpeg_quality = jpeg_quality
     
     def __call__(self, pil_img):
@@ -51,16 +51,28 @@ class DatasetFromFolder(Dataset):
         return any(filename.lower().endswith(extension) for extension in fmt)
 
 
+class ReduceSize:
+    """Уменьшить размер в k раз"""
+    def __init__(self, k):
+        self.k = k
+    
+    def __call__(self, pil_img):
+        img_width, img_height = pil_img.size
+        return pil_img.resize(
+            (int(img_width/self.k), int(img_height/self.k)), Image.BICUBIC)
+
+
 def get_train_dataset(dataset_dir, crop_size):
     ds = DatasetFromFolder(
         dataset_dir=dataset_dir,
         source_transform=Compose([
+            ReduceSize(5),
             RandomCrop(crop_size),
             ToTensor(),
         ]),
         input_transform=Compose([
             ToPILImage(),
-            TransformImgToJpg(),
+            TransformImgToJpg(jpeg_quality=30),
             ToTensor()
         ])
     )
@@ -71,12 +83,13 @@ def get_valid_dataset(dataset_dir, crop_size):
     ds = DatasetFromFolder(
         dataset_dir=dataset_dir,
         source_transform=Compose([
+            ReduceSize(5),
             CenterCrop(crop_size),
             ToTensor(),
         ]),
         input_transform=Compose([
             ToPILImage(),
-            TransformImgToJpg(),
+            TransformImgToJpg(jpeg_quality=30),
             ToTensor()
         ])
     )
