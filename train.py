@@ -11,10 +11,10 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from lib.model import get_model_by_name
-from lib.data import get_train_dataset, get_valid_dataset
-from lib.utils import AverageMeter
-from lib import metrics
+from arcnn.model import get_model_by_name
+from arcnn.data import get_train_dataset, get_valid_dataset
+from arcnn.utils import AverageMeter
+from arcnn import metrics
 
 
 def arguments():

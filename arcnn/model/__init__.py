@@ -1,7 +1,7 @@
 import torch
 
-from lib.model.arcnn import ARCNN, FastARCNN
-from lib.model.vdsr import VDSR
+from arcnn.model.arcnn import ARCNN, FastARCNN
+from arcnn.model.vdsr import VDSR
 
 
 def get_model_by_name(arch: str, path: str = None):

@@ -8,7 +8,7 @@ from PIL import Image, ImageOps
 from torchvision.transforms import ToTensor, ToPILImage
 import torchvision.utils as utils
 
-from lib.model import get_model_by_name
+from arcnn.model import get_model_by_name
 
 
 def arguments():

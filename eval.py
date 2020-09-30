@@ -10,9 +10,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, ToTensor, ToPILImage
 
-from lib.model import get_model_by_name
-from lib.data import get_valid_dataset
-from lib.data import DatasetFromFolder, TransformImgToJpg, ReduceSize
+from arcnn.model import get_model_by_name
+from arcnn.data import get_valid_dataset
+from arcnn.data import DatasetFromFolder, TransformImgToJpg, ReduceSize
 from train import validation
 
 
