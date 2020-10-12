@@ -12,6 +12,9 @@ class Conv_ReLU_Block(nn.Module):
         return self.relu(self.conv(x))
 
 class VDSR(nn.Module):
+    """
+    Input fromat: (bs, ch, h, w)
+    """
     def __init__(self):
         super().__init__()
         self.residual_layer = self.make_layer(Conv_ReLU_Block, 18)

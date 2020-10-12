@@ -85,7 +85,7 @@ def get_valid_dataset(dataset_dir, crop_size):
         source_transform=Compose([
             ReduceSize(5),
             CenterCrop(crop_size),
-            ToTensor(),
+            ToTensor(),  # C, H, W
         ]),
         input_transform=Compose([
             ToPILImage(),

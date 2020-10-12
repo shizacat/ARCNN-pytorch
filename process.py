@@ -55,10 +55,12 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Load model and et
-    model = get_model_by_name(opt.arch, opt.model)
-    model = model.to(device)
+    with torch.no_grad():
+        # Load model and et
+        model = get_model_by_name(opt.arch, opt.model)
+        model = model.to(device)
+        model.eval()
 
-    pred = model(image_prepea(opt.image).to(device))
-    img_out = pred.data.cpu().squeeze(0)
-    utils.save_image(img_out, gen_filename(opt.image))
+        pred = model(image_prepea(opt.image).to(device))
+        img_out = pred.data.cpu().squeeze(0)
+        utils.save_image(img_out, gen_filename(opt.image))
