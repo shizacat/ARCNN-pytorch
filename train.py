@@ -168,12 +168,12 @@ if __name__ == "__main__":
 
     # Load dataset
     train_set = get_train_dataset(
-        os.path.join(opt.data_folder, "train"),
-        crop_size=600
+        os.path.join(opt.data_folder, "train/scans"),
+        crop_size=(224, 224)
     )
     val_set = get_valid_dataset(
-        os.path.join(opt.data_folder, "val"),
-        (600, 600)
+        os.path.join(opt.data_folder, "val/scans"),
+        (224, 224)
     )
     train_loader = DataLoader(
         dataset=train_set,

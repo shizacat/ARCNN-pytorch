@@ -4,7 +4,8 @@ import io
 from PIL import Image
 from torch.utils.data.dataset import Dataset
 from torchvision.transforms import (
-    Compose, RandomCrop, ToTensor, ToPILImage, CenterCrop, Resize
+    Compose, RandomCrop, ToTensor, ToPILImage, CenterCrop, Resize,
+    RandomResizedCrop
 )
 
 
@@ -68,6 +69,7 @@ def get_train_dataset(dataset_dir, crop_size):
         source_transform=Compose([
             ReduceSize(5),
             RandomCrop(crop_size),
+            RandomResizedCrop(crop_size, scale=(0.08, 2), ratio=(1, 1)),
             ToTensor(),
         ]),
         input_transform=Compose([

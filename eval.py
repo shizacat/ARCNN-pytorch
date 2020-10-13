@@ -9,11 +9,13 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, ToTensor, ToPILImage
+from tqdm import tqdm
 
-from arcnn.model import get_model_by_name
 from arcnn.data import get_valid_dataset
 from arcnn.data import DatasetFromFolder, TransformImgToJpg, ReduceSize
-from train import validation
+from arcnn.utils import AverageMeter
+from process import Process
+from arcnn import metrics
 
 
 def arguments():
@@ -42,8 +44,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = get_model_by_name(opt.arch, opt.model)
-    model = model.to(device)
+    process = Process(opt.arch, opt.model, device)
 
     # Load dataset
     eval_set = DatasetFromFolder(
@@ -66,8 +67,19 @@ if __name__ == "__main__":
     )
 
     # Eval
-    criterion = nn.MSELoss()
-    _, _, psnr_avg, ssim_avg = validation(
-        model, eval_loader, criterion, device, False)
+    psnr = AverageMeter()
+    ssim = AverageMeter()
+
+    eval_bar = tqdm(eval_loader)
+    for idx, item in enumerate(eval_bar):
+        img_input, img_truth = item  # batch = 1
+        img_input = ToPILImage()(img_input[0])
+
+        img_out = process.run(img_input)
+        img_out = ToTensor()(img_out).unsqueeze(0)
+
+        psnr.update(metrics.PSNR()(img_out, img_truth).item(), 1)
+        ssim.update(metrics.ssim(img_out, img_truth).item(), 1)
+
     print("Jpeg quality: {}".format(jpeg_quality))
-    print("PSNR avg: {:.4f} dB; SSIM avg: {:.4f}".format(psnr_avg, ssim_avg))
+    print("PSNR avg: {:.4f} dB; SSIM avg: {:.4f}".format(psnr.avg, ssim.avg))
